@@ -16,13 +16,13 @@ public class Validators {
     }
 
     boolean personValidator(Person person) {
-        System.out.println("person validator");
+        System.out.println("person validator called");
         System.out.println("person :: " + person);
         return true;
     }
 
     boolean portfolioValidator(Portfolio portfolio) {
-        System.out.println("portfolio validator");
+        System.out.println("portfolio validator called");
         System.out.println("portfolio :: " + portfolio);
         return true;
     }

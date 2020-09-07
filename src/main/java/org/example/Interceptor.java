@@ -32,11 +32,12 @@ public class Interceptor implements MethodInterceptor {
         String multiParamValidators = invocation.getMethod().getAnnotation(ValidateArg.class).value();
 
         System.out.println("found - " + multiParamValidators);
+        int i = 0;
         for (Parameter parameter : invocation.getMethod().getParameters()) {
             String singleArgValidator = parameter.getAnnotation(ValidateArg.class).value();
             System.out.println(singleArgValidator);
 
-            methods.get(singleArgValidator).invoke(this.validators, invocation.getArguments()[0]);
+            methods.get(singleArgValidator).invoke(this.validators, invocation.getArguments()[i++]);
         }
 
 

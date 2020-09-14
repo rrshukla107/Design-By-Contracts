@@ -3,9 +3,9 @@ package org.example;
 public class PortfolioGenerator {
 
     @UnderValidation
-    @ValidateArg("compoundValidation(person, portfolio)")
-    public void generate(@ValidateArg("personValidator") Person person, @ValidateArg("portfolioValidator") Portfolio portfolio) {
-        System.out.println("generate method called..!");
+    @ValidateMultipleArgs({"compoundValidation(person, portfolio)", "compoundValidationSecondary(person, portfolio)"})
+    public void generate(@ValidateArg({"personValidator", "secondaryPersonValidator"}) Person person, @ValidateArg("portfolioValidator") Portfolio portfolio) {
+        System.out.println("Portfolio Generator Called..!");
     }
 
 

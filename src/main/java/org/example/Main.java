@@ -2,6 +2,9 @@ package org.example;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.example.person.Person;
+import org.example.portfolio.Portfolio;
+import org.example.portfolio.PortfolioGenerator;
 
 public class Main {
 

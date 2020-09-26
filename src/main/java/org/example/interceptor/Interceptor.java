@@ -1,7 +1,11 @@
-package org.example;
+package org.example.interceptor;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.example.annotations.ValidateArg;
+import org.example.annotations.ValidateMultipleArgs;
+import org.example.contract.Contract;
+import org.example.contract.Validators;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +23,7 @@ public class Interceptor implements MethodInterceptor {
     private Validators validators;
 
     @Inject
-    Interceptor(Validators validators) {
+    public Interceptor(Validators validators) {
         this.validators = validators;
     }
 

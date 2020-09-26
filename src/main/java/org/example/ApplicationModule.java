@@ -2,6 +2,10 @@ package org.example;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
+import org.example.annotations.UnderValidation;
+import org.example.contract.Validators;
+import org.example.interceptor.Interceptor;
+import org.example.portfolio.PortfolioGenerator;
 
 public class ApplicationModule extends AbstractModule {
     @Override

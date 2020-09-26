@@ -6,13 +6,14 @@ import org.example.annotations.UnderValidation;
 import org.example.contract.Validators;
 import org.example.interceptor.Interceptor;
 import org.example.portfolio.PortfolioGenerator;
+import org.example.portfolio.PortfolioGeneratorImpl1;
 
 public class ApplicationModule extends AbstractModule {
     @Override
     protected void configure() {
 
         bind(Validators.class);
-        bind(PortfolioGenerator.class);
+        bind(PortfolioGenerator.class).to(PortfolioGeneratorImpl1.class);
 
         bindInterceptor(
                 Matchers.any(),

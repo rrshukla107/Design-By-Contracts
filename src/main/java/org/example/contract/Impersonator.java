@@ -1,9 +1,8 @@
 package org.example.contract;
 
-public interface Impersonator<T> extends FlatContract<T> {
+public interface Impersonator<ARG1> extends FlatContract<ARG1> {
 
-    void preValidation(T data);
 
-    void postValidation(T data);
+    ARG1 preValidation(ARG1 data);
 
 }

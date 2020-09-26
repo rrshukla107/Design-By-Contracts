@@ -1,6 +1,7 @@
 package org.example.contract;
 
-public interface FlatContract<T> {
+@FunctionalInterface
+public interface FlatContract<ARG1> {
 
-    void validate(T data);
+    boolean validate(ARG1 data);
 }

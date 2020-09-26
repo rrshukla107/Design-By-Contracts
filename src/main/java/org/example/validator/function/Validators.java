@@ -1,4 +1,4 @@
-package org.example.contract;
+package org.example.validator.function;
 
 import org.example.person.Person;
 import org.example.portfolio.Portfolio;

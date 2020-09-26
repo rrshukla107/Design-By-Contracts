@@ -1,19 +1,17 @@
 package org.example.contract;
 
-public abstract class AbstractImpersonator<T> implements Impersonator<T> {
+public abstract class AbstractImpersonator<ARG1> implements Impersonator<ARG1> {
 
-    private FlatContract<T> contract;
+    private FlatContract<ARG1> contract;
 
-    public AbstractImpersonator(FlatContract<T> contract) {
+
+    public AbstractImpersonator(FlatContract<ARG1> contract) {
         this.contract = contract;
     }
 
+
     @Override
-    public void validate(T data) {
-        this.preValidation(data);
-
-        this.contract.validate(data);
-
-        this.postValidation(data);
+    public boolean validate(ARG1 data) {
+        return this.contract.validate(this.preValidation(data));
     }
 }

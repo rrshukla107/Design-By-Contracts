@@ -5,7 +5,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.example.annotations.ValidateArg;
 import org.example.annotations.ValidateMultipleArgs;
 import org.example.contract.Contract;
-import org.example.contract.Validators;
+import org.example.validator.function.Validators;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;

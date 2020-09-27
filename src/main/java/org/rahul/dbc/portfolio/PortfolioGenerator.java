@@ -1,6 +1,6 @@
-package org.example.portfolio;
+package org.rahul.dbc.portfolio;
 
-import org.example.person.Person;
+import org.rahul.dbc.person.Person;
 
 public interface PortfolioGenerator {
     void generate(Person person, Portfolio portfolio);

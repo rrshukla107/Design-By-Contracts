@@ -1,9 +1,9 @@
-package org.example.portfolio;
+package org.rahul.dbc.portfolio;
 
-import org.example.annotations.UnderValidation;
-import org.example.annotations.ValidateArg;
-import org.example.annotations.ValidateMultipleArgs;
-import org.example.person.Person;
+import org.rahul.dbc.annotations.UnderValidation;
+import org.rahul.dbc.annotations.ValidateArg;
+import org.rahul.dbc.annotations.ValidateMultipleArgs;
+import org.rahul.dbc.person.Person;
 
 public class PortfolioGeneratorImpl1 implements PortfolioGenerator {
 

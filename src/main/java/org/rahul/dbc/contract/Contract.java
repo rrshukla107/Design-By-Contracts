@@ -1,4 +1,4 @@
-package org.example.contract;
+package org.rahul.dbc.contract;
 
 import java.lang.reflect.Method;
 import java.util.List;

@@ -1,11 +1,11 @@
-package org.example.interceptor;
+package org.rahul.dbc.interceptor;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.example.annotations.ValidateArg;
-import org.example.annotations.ValidateMultipleArgs;
-import org.example.contract.Contract;
-import org.example.validator.function.Validators;
+import org.rahul.dbc.annotations.ValidateArg;
+import org.rahul.dbc.annotations.ValidateMultipleArgs;
+import org.rahul.dbc.contract.Contract;
+import org.rahul.dbc.validator.function.Validators;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
@@ -18,12 +18,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Interceptor implements MethodInterceptor {
+public class ContractsAsFunctionsInterceptor implements MethodInterceptor {
 
     private Validators validators;
 
     @Inject
-    public Interceptor(Validators validators) {
+    public ContractsAsFunctionsInterceptor(Validators validators) {
         this.validators = validators;
     }
 
@@ -48,7 +48,7 @@ public class Interceptor implements MethodInterceptor {
         contracts.addAll(getMultipleFieldContracts(methods, multipleFieldValidators));
 
         // STEP 7 - Execute the contracts
-        Map<String, Object> argumentMappings = getParameterMappings(invocation, parameters);
+        Map<String, Object> argumentMappings = InterceptorUtils.getParameterMappings(invocation, parameters);
         executeContracts(contracts, argumentMappings);
 
         // STEP 8 - Continue with the invocation
@@ -91,18 +91,6 @@ public class Interceptor implements MethodInterceptor {
                 e.printStackTrace();
             }
         });
-    }
-
-    private Map<String, Object> getParameterMappings(MethodInvocation invocation, Parameter[] parameters) {
-        List<String> parameterNames = Stream.of(parameters).map(Parameter::getName).collect(Collectors.toList());
-        Object[] arguments = invocation.getArguments();
-
-        Map<String, Object> argumentMappings = new HashMap<>();
-
-        for (int i = 0; i < parameterNames.size(); i++) {
-            argumentMappings.put(parameterNames.get(i), arguments[i]);
-        }
-        return argumentMappings;
     }
 
     Object[] getArgs(List<String> argumentNames, Map<String, Object> mappings) {

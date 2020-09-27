@@ -1,4 +1,4 @@
-package org.example.portfolio;
+package org.rahul.dbc.portfolio;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +16,6 @@ public class Portfolio {
 
     @Override
     public String toString() {
-        return "Portfolio Name - " + this.portfolioName;
+        return this.portfolioName;
     }
 }

@@ -1,4 +1,4 @@
-package org.example.contract;
+package org.rahul.dbc.contract;
 
 public abstract class AbstractImpersonator<ARG1> implements Impersonator<ARG1> {
 

@@ -1,7 +1,7 @@
-package org.example.validator.function;
+package org.rahul.dbc.validator.function;
 
-import org.example.person.Person;
-import org.example.portfolio.Portfolio;
+import org.rahul.dbc.person.Person;
+import org.rahul.dbc.portfolio.Portfolio;
 
 public class Validators {
 

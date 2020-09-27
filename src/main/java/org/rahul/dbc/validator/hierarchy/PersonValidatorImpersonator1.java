@@ -1,8 +1,8 @@
-package org.example.validator.hierarchy;
+package org.rahul.dbc.validator.hierarchy;
 
-import org.example.contract.AbstractImpersonator;
-import org.example.contract.FlatContract;
-import org.example.person.Person;
+import org.rahul.dbc.contract.AbstractImpersonator;
+import org.rahul.dbc.contract.FlatContract;
+import org.rahul.dbc.person.Person;
 
 public class PersonValidatorImpersonator1 extends AbstractImpersonator<Person> {
 

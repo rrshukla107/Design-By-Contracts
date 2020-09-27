@@ -1,4 +1,4 @@
-package org.example.person;
+package org.rahul.dbc.person;
 
 public class Person {
 
@@ -22,6 +22,6 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Person Name - " + firstName + " " + lastName;
+        return firstName + " " + lastName;
     }
 }

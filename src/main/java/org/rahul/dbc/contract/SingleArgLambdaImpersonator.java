@@ -1,4 +1,4 @@
-package org.example.contract;
+package org.rahul.dbc.contract;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -10,7 +10,7 @@ public class SingleArgLambdaImpersonator<ARG1> extends AbstractImpersonator<ARG1
     private FlatContract<ARG1> contract;
 
 
-    public SingleArgLambdaImpersonator(FlatContract<ARG1> contract, Function<ARG1, ARG1> preValidator) {
+    public SingleArgLambdaImpersonator(Function<ARG1, ARG1> preValidator, FlatContract<ARG1> contract) {
         super(contract);
         this.preValidator = preValidator;
     }

@@ -17,11 +17,16 @@ public class Main {
 
 //        portfolioGenerator.generate(new Person("Rahul", "Shukla"), new Portfolio("Rahul's portfolio"));
 
+        testImpersonator();
+    }
 
+    private static void testImpersonator() {
         //Method 1
+        System.out.println("--------METHOD 1------------");
         new PersonValidatorImpersonator1(new PersonValidatorImpersonator2(new PersonValidator())).validate(new Person("Rahul", "Shukla"));
 
         //Method 2
+        System.out.println("--------METHOD 2------------");
         new SingleArgLambdaImpersonator<>(new SingleArgLambdaImpersonator<Person>(person -> {
             System.out.println("This is the original Validator");
             System.out.println("Person :: " + person);
@@ -38,6 +43,13 @@ public class Main {
             return p;
         }).validate(new Person("Rahul", "Shukla"));
 
-
+        //Method 3
+        System.out.println("--------METHOD 3------------");
+        new SingleArgLambdaImpersonator<>(new PersonValidatorImpersonator1(new PersonValidator()), person -> {
+            Person p = new Person("Name 2", "Surname 2");
+            System.out.println("Person input :: " + person);
+            System.out.println("Person changed to ::" + p);
+            return p;
+        }).validate(new Person("Rahul", "Shukla"));
     }
 }

@@ -1,4 +1,6 @@
-package org.rahul.dbc.contract;
+package org.rahul.dbc.contract.impersonator;
+
+import org.rahul.dbc.contract.flatcontract.FlatContract;
 
 import java.util.Optional;
 import java.util.function.Function;

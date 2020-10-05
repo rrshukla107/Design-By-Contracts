@@ -1,4 +1,4 @@
-package org.rahul.dbc.contract;
+package org.rahul.dbc.contract.flatcontract;
 
 @FunctionalInterface
 public interface FlatContract<ARG1> {

@@ -1,6 +1,6 @@
 package org.rahul.dbc.validator.hierarchy;
 
-import org.rahul.dbc.contract.FlatContract;
+import org.rahul.dbc.contract.flatcontract.FlatContract;
 import org.rahul.dbc.person.Person;
 
 public class PersonValidator implements FlatContract<Person> {

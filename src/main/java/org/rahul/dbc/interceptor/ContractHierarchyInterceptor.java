@@ -3,7 +3,7 @@ package org.rahul.dbc.interceptor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.rahul.dbc.annotations.Validate;
-import org.rahul.dbc.contract.FlatContract;
+import org.rahul.dbc.contract.flatcontract.FlatContract;
 import org.rahul.dbc.validator.hierarchy.ValidatorFactory;
 
 import javax.inject.Inject;

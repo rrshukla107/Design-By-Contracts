@@ -2,7 +2,7 @@ package org.rahul.dbc;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.rahul.dbc.contract.SingleArgLambdaImpersonator;
+import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
 import org.rahul.dbc.person.Person;
 import org.rahul.dbc.validator.hierarchy.PersonValidator;
 import org.rahul.dbc.validator.hierarchy.PersonValidatorImpersonator1;

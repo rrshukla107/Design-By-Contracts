@@ -1,7 +1,7 @@
 package org.rahul.dbc.validator.hierarchy;
 
-import org.rahul.dbc.contract.FlatContract;
-import org.rahul.dbc.contract.SingleArgLambdaImpersonator;
+import org.rahul.dbc.contract.flatcontract.FlatContract;
+import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
 import org.rahul.dbc.person.Person;
 import org.rahul.dbc.portfolio.Portfolio;
 

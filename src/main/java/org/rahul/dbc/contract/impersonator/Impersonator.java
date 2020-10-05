@@ -1,4 +1,6 @@
-package org.rahul.dbc.contract;
+package org.rahul.dbc.contract.impersonator;
+
+import org.rahul.dbc.contract.flatcontract.FlatContract;
 
 public interface Impersonator<ARG1> extends FlatContract<ARG1> {
 

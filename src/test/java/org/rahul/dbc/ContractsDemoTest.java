@@ -4,7 +4,10 @@ import net.lamberto.junit.GuiceJUnitRunner;
 import net.lamberto.junit.GuiceJUnitRunner.GuiceModules;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.rahul.dbc.contract.chaperone.SingleArgLambdaChaperone;
+import org.rahul.dbc.contract.flatcontract.And;
 import org.rahul.dbc.contract.flatcontract.FlatContract;
+import org.rahul.dbc.contract.flatcontract.Or;
 import org.rahul.dbc.contract.flatcontract.SingleArgCachedFlatContract;
 import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
 import org.rahul.dbc.person.Person;
@@ -46,18 +49,65 @@ public class ContractsDemoTest {
         SingleArgCachedFlatContract<Person> cachedContract = new SingleArgCachedFlatContract<>(contractDelayWith5Seconds);
 
         Person person = new Person("R", "S");
+        System.out.println("First Attempt");
         System.out.println(cachedContract.validate(person));
+        System.out.println("Second Attempt");
         System.out.println(cachedContract.validate(person));
 
+    }
+
+    @Test
+    public void demoOrHierarchy() {
+
+        FlatContract<Person> flatContract1 = person -> {
+            System.out.println("Contract 1");
+            return true;
+        };
+
+        FlatContract<Person> flatContract2 = person -> {
+            System.out.println("Contract 2");
+            return false;
+        };
+
+        FlatContract<Person> flatContract3 = person -> {
+            System.out.println("Contract 3");
+            return true;
+        };
+
+        System.out.println(new Or<>(new Or<>(flatContract1, flatContract2), flatContract3).validate(new Person("R", "S")));
+        System.out.print(flatContract1.or(flatContract2).or(flatContract3).validate(new Person("R", "S")));
     }
 
     @Test
     public void demoAndHierarchy() {
 
+
+        FlatContract<Person> flatContract1 = person -> {
+            System.out.println("Contract 1");
+            return true;
+        };
+
+        FlatContract<Person> flatContract2 = person -> {
+            System.out.println("Contract 2");
+            return true;
+        };
+
+        FlatContract<Person> flatContract3 = person -> {
+            System.out.println("Contract 3");
+            return false;
+        };
+
+        System.out.println(new And<>(new And<>(flatContract1, flatContract2), flatContract3).validate(new Person("R", "S")));
+        System.out.print(flatContract1.and(flatContract2).and(flatContract3).validate(new Person("R", "S")));
+
     }
 
     @Test
-    public void demoChaperoneContracthierarchy() {
+    public void demoChaperoneContractHierarchy() {
+
+        new SingleArgLambdaChaperone<>(person ->
+                System.out.println("Inside the chaperone")
+                , new PersonValidator()).validate(new Person("Rahul", "Shukla"));
 
     }
 

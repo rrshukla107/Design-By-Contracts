@@ -1,6 +1,6 @@
 package org.rahul.dbc.contract.flatcontract;
 
-public abstract class Or<ARG1> implements FlatContract<ARG1> {
+public class Or<ARG1> implements FlatContract<ARG1> {
 
     private FlatContract<ARG1> underlyingContract;
     private FlatContract<ARG1> wrapperContract;

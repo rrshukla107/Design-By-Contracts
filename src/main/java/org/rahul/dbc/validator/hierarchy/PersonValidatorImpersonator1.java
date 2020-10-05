@@ -11,7 +11,7 @@ public class PersonValidatorImpersonator1 extends AbstractImpersonator<Person> {
     }
 
     @Override
-    public Person preValidation(Person data) {
+    public Person impersonateArgument(Person data) {
         System.out.println("PersonValidatorImpersonator1 with person ::" + data);
         return new Person("New1", "Name1");
     }

@@ -12,6 +12,6 @@ public abstract class AbstractImpersonator<ARG1> implements Impersonator<ARG1> {
 
     @Override
     public boolean validate(ARG1 data) {
-        return this.contract.validate(this.preValidation(data));
+        return this.contract.validate(this.impersonateArgument(data));
     }
 }

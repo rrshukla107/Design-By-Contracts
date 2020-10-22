@@ -1,12 +1,17 @@
 package org.rahul.dbc.engine;
 
-import org.rahul.dbc.contract.flatcontract.FlatContract;
+import java.util.List;
 
-import java.util.Map;
+public class SingleArgumentContractChain<ARG1> implements ContractChain {
 
-public class SingleArgumentContractChain<T> {
+    private List<SingleArgContractWrapper<ARG1>> contracts;
 
-    private Map<String, FlatContract<T>> contracts;
+    public SingleArgumentContractChain(final List<SingleArgContractWrapper<ARG1>> contractMapping) {
+        this.contracts = contractMapping;
+    }
 
-
+    @Override
+    public ChainResult executeChain() {
+        return null;
+    }
 }

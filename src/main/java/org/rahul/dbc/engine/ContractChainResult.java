@@ -8,13 +8,29 @@ public class ContractChainResult implements ChainResult {
 
     private Throwable underlyingException;
 
-    public ContractChainResult(boolean result) {
+    private final String failedContractName;
+
+    private ContractChainResult(boolean result, final String underlyingContract) {
         this.result = result;
+        this.failedContractName = underlyingContract;
     }
 
-    public ContractChainResult(final Throwable exception) {
+    private ContractChainResult(final Throwable exception, final String failedContractName) {
         this.underlyingException = exception;
         this.result = false;
+        this.failedContractName = failedContractName;
+    }
+
+    public static ContractChainResult successfulChainResult() {
+        return new ContractChainResult(true, null);
+    }
+
+    public static ContractChainResult failedChainResult(final String failedContractName) {
+        return new ContractChainResult(false, failedContractName);
+    }
+
+    public static ContractChainResult failedChainResultDueToException(final String failedContractName, Throwable exception) {
+        return new ContractChainResult(exception, failedContractName);
     }
 
     @Override
@@ -24,7 +40,7 @@ public class ContractChainResult implements ChainResult {
 
     @Override
     public boolean hasFailed() {
-        return this.result == false;
+        return !this.result;
     }
 
     @Override
@@ -36,4 +52,10 @@ public class ContractChainResult implements ChainResult {
     public Optional<Throwable> getUnderlyingException() {
         return Optional.ofNullable(this.underlyingException);
     }
+
+    @Override
+    public Optional<String> getFailedContractName() {
+        return Optional.ofNullable(this.failedContractName);
+    }
+
 }

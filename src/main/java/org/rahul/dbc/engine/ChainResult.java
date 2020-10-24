@@ -12,4 +12,6 @@ public interface ChainResult {
 
     Optional<Throwable> getUnderlyingException();
 
+    Optional<String> getFailedContractName();
+
 }

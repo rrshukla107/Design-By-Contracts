@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class ContractChainExecutorEngineTest {
+public class ContractChainExecutorImplTest {
 
     private ContractChainExecutor chainExecutor;
 
@@ -63,7 +63,7 @@ public class ContractChainExecutorEngineTest {
 
     @Before
     public void setup() {
-        this.chainExecutor = new ContractChainExecutorEngine(new ContractExecutionEngineImpl(Executors.newFixedThreadPool(5)));
+        this.chainExecutor = new ContractChainExecutorImpl(new ContractExecutionEngineImpl(Executors.newFixedThreadPool(5)));
     }
 
     @Test

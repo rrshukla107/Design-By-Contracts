@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ContractChainExecutorEngine implements ContractChainExecutor {
+public class ContractChainExecutorImpl implements ContractChainExecutor {
 
     private final ContractExecutionEngine contractExecutionEngine;
 
 
-    public ContractChainExecutorEngine(final ContractExecutionEngine contractExecutionEngine) {
+    public ContractChainExecutorImpl(final ContractExecutionEngine contractExecutionEngine) {
         this.contractExecutionEngine = contractExecutionEngine;
     }
 

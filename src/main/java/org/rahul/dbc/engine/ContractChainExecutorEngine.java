@@ -32,19 +32,14 @@ public class ContractChainExecutorEngine implements ContractChainExecutor {
             if (failure != null) {
                 result.complete(
                         ContractChainResult.failedChainResultDueToException(
-                                contractChain.get(index.get()).getContractName(), failure));
-            }
-
-            if (!isSuccessful) {
+                                contractChain.get(index.get() - 1).getContractName(), failure));
+            } else if (!isSuccessful) {
                 result.complete(
-                        ContractChainResult.failedChainResult(contractChain.get(index.get()).getContractName()));
-            }
-
-            if (isSuccessful && index.get() < contractChain.size()) {
+                        ContractChainResult.failedChainResult(contractChain.get(index.get() - 1).getContractName()));
+            } else if (index.get() < contractChain.size()) {
                 this.executeTask(result, index, contractChain);
-            }
 
-            if (isSuccessful && index.get() == contractChain.size()) {
+            } else if (index.get() == contractChain.size()) {
                 result.complete(ContractChainResult.successfulChainResult());
             }
 

@@ -8,7 +8,7 @@ public class SingleArgContractWrapper<ARG1> {
     private FlatContract<ARG1> contract;
     private ARG1 argumentValue;
 
-    private SingleArgContractWrapper(final String contractName, final FlatContract<ARG1> contract, final ARG1 argumentValue) {
+    public SingleArgContractWrapper(final String contractName, final FlatContract<ARG1> contract, final ARG1 argumentValue) {
         this.contractName = contractName;
         this.contract = contract;
         this.argumentValue = argumentValue;

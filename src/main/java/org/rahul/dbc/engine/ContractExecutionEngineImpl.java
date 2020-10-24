@@ -16,8 +16,12 @@ public class ContractExecutionEngineImpl implements ContractExecutionEngine {
 
         CompletableFuture<Boolean> result = new CompletableFuture<>();
         this.executorService.submit(() -> {
-            boolean contractResult = contract.getContract().validate(contract.getArgumentValue());
-            result.complete(contractResult);
+            try {
+                boolean contractResult = contract.getContract().validate(contract.getArgumentValue());
+                result.complete(contractResult);
+            } catch (Throwable e) {
+                result.completeExceptionally(e);
+            }
         });
 
         return result;

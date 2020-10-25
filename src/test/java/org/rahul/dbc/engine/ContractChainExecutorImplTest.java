@@ -3,7 +3,12 @@ package org.rahul.dbc.engine;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.rahul.dbc.contract.chaperone.Chaperone;
+import org.rahul.dbc.contract.chaperone.SingleArgLambdaChaperone;
 import org.rahul.dbc.contract.flatcontract.FlatContract;
+import org.rahul.dbc.contract.flatcontract.SingleArgCachedFlatContract;
+import org.rahul.dbc.contract.impersonator.Impersonator;
+import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -66,6 +71,20 @@ public class ContractChainExecutorImplTest {
     };
 
 
+    private Impersonator<Object> impersonator1 = new SingleArgLambdaImpersonator<>(arg1 -> {
+        System.out.println("In Impersonator");
+        return arg1;
+    }, contract1);
+
+    private Chaperone<Object> chaperone1 = new SingleArgLambdaChaperone<>(arg1 -> {
+        System.out.println("In chaperone1");
+    }, contract2);
+
+    private FlatContract<Object> cachedContract1 = new SingleArgCachedFlatContract<>(contract3);
+    private FlatContract<Object> cachedContract2 = new SingleArgCachedFlatContract<>(impersonator1);
+    private FlatContract<Object> cachedContract3 = new SingleArgCachedFlatContract<>(chaperone1);
+
+
     @Before
     public void setup() {
         this.chainExecutor = new ContractChainExecutorImpl(new ContractExecutionEngineImpl(Executors.newFixedThreadPool(5)));
@@ -83,6 +102,22 @@ public class ContractChainExecutorImplTest {
         ChainResult result = promise.get();
         Assert.assertTrue(result.getResult());
 
+    }
+
+    @Test
+    public void testChainWithContractHierarchy() throws ExecutionException, InterruptedException {
+
+        CompletableFuture<ChainResult> promise = this.chainExecutor.executeChain(List.of(
+                this.getWrapper("contract1", contract1, new Object())
+                , this.getWrapper("impersonator1", impersonator1, new Object())
+                , this.getWrapper("chaperone1", chaperone1, new Object())
+                , this.getWrapper("cachedContract1", cachedContract1, new Object())
+                , this.getWrapper("cachedContract2", cachedContract2, new Object())
+                , this.getWrapper("cachedContract3", cachedContract3, new Object())));
+
+
+        ChainResult result = promise.get();
+        Assert.assertTrue(result.getResult());
     }
 
     @Test

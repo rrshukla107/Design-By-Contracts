@@ -1,11 +1,13 @@
 package org.rahul.dbc.use_case.trade;
 
 import lombok.Data;
+import lombok.Getter;
 import org.rahul.dbc.use_case.trader.Trader;
 
 import java.time.LocalDate;
 
 @Data
+@Getter
 public class Trade {
 
     private Trader trader;
@@ -21,5 +23,9 @@ public class Trade {
     private LocalDate valueDate;
 
     private Expiration expiration;
+
+    private Double askPrice;
+
+    private Double bidPrice;
 
 }

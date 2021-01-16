@@ -45,7 +45,7 @@ public class ContractChainResult implements ChainResult {
 
     @Override
     public boolean isSuccessful() {
-        return this.result = true;
+        return this.result == true;
     }
 
     @Override

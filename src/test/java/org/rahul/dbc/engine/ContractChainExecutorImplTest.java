@@ -191,9 +191,9 @@ public class ContractChainExecutorImplTest {
                 , this.getWrapper("contractFailure", contractFailure1, new Object())
                 , this.getWrapper("contract3", contract3, new Object()));
 
-        List<SingleArgContractWrapper<Object>> chainWithExceptions = List.of(this.getWrapper("contract1", contract1, new Object()),
-                this.getWrapper("contractException", this.contractWithRuntimeError, new Object()),
-                this.getWrapper("contract3", contract3, new Object()));
+        List<SingleArgContractWrapper<Object>> chainWithExceptions = List.of(this.getWrapper("contract1", contract1, new Object())
+                , this.getWrapper("contractException", this.contractWithRuntimeError, new Object())
+                , this.getWrapper("contract3", contract3, new Object()));
 
 
         //FORK

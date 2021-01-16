@@ -10,6 +10,8 @@ public class EquityBuyOrderExecutor implements TradeExecutor {
     public CompletableFuture<Void> executeOrder(Trade trade, Trader trader) {
         CompletableFuture<Void> result = new CompletableFuture<>();
 
+        // Actual Business Logic
+
 
         return result;
     }

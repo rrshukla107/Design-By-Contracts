@@ -4,6 +4,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
 import org.rahul.dbc.person.Person;
+import org.rahul.dbc.portfolio.Portfolio;
+import org.rahul.dbc.portfolio.PortfolioGenerator;
+import org.rahul.dbc.portfolio.PortfolioGeneratorImpl2;
 import org.rahul.dbc.validator.hierarchy.PersonValidator;
 import org.rahul.dbc.validator.hierarchy.PersonValidatorImpersonator1;
 import org.rahul.dbc.validator.hierarchy.PersonValidatorImpersonator2;
@@ -13,10 +16,12 @@ public class Main {
     public static void main(String[] args) {
         Injector injector = Guice.createInjector(new ApplicationModule());
 //        PortfolioGenerator portfolioGenerator = injector.getInstance(PortfolioGeneratorImpl1.class);
-//        PortfolioGenerator portfolioGenerator = injector.getInstance(PortfolioGeneratorImpl2.class);
-//        portfolioGenerator.generate(new Person("Rahul", "Shukla"), new Portfolio("Rahul's portfolio"));
+        PortfolioGenerator portfolioGenerator = injector.getInstance(PortfolioGeneratorImpl2.class);
+        portfolioGenerator.generate(new Person("Rahul", "Shukla"), new Portfolio("Rahul's portfolio"));
 
-        testImpersonator();
+
+        System.out.println("Executed successfully");
+//        testImpersonator();
     }
 
     private static void testImpersonator() {

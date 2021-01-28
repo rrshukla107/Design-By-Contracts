@@ -7,6 +7,7 @@ import org.rahul.dbc.annotations.UnderValidation;
 import org.rahul.dbc.annotations.Validate;
 import org.rahul.dbc.engine.ContractChainExecutorImpl;
 import org.rahul.dbc.engine.ContractExecutionEngineImpl;
+import org.rahul.dbc.executor_factories.ExecutorServiceFactory;
 import org.rahul.dbc.interceptor.ContractHierarchyInterceptor;
 import org.rahul.dbc.interceptor.ContractsAsFunctionsInterceptor;
 import org.rahul.dbc.portfolio.PortfolioGenerator;
@@ -16,7 +17,6 @@ import org.rahul.dbc.validator.function.Validators;
 import org.rahul.dbc.validator.hierarchy.PortfolioContracts;
 
 import java.util.List;
-import java.util.concurrent.Executors;
 
 public class ApplicationModule extends AbstractModule {
     @Override
@@ -36,7 +36,7 @@ public class ApplicationModule extends AbstractModule {
                 Matchers.any(),
                 Matchers.annotatedWith(Validate.class),
                 new ContractHierarchyInterceptor(new ValidatorFactory(List.of(new PortfolioContracts())),
-                        new ContractChainExecutorImpl(new ContractExecutionEngineImpl(Executors.newFixedThreadPool(5)))));
+                        new ContractChainExecutorImpl(new ContractExecutionEngineImpl(ExecutorServiceFactory.getFixedThreadPoolExecutorService()))));
 
     }
 }

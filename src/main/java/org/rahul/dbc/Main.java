@@ -3,6 +3,7 @@ package org.rahul.dbc;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
+import org.rahul.dbc.executor_factories.ExecutorServiceFactory;
 import org.rahul.dbc.person.Person;
 import org.rahul.dbc.portfolio.Portfolio;
 import org.rahul.dbc.portfolio.PortfolioGenerator;
@@ -17,10 +18,21 @@ public class Main {
         Injector injector = Guice.createInjector(new ApplicationModule());
 //        PortfolioGenerator portfolioGenerator = injector.getInstance(PortfolioGeneratorImpl1.class);
         PortfolioGenerator portfolioGenerator = injector.getInstance(PortfolioGeneratorImpl2.class);
-        portfolioGenerator.generate(new Person("Rahul", "Shukla"), new Portfolio("Rahul's portfolio"));
 
 
         System.out.println("Executed successfully");
+        try {
+            portfolioGenerator.generate(new Person("Rahul", "Shukla"), new Portfolio("Rahul's portfolio"));
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        } finally {
+            try {
+                ExecutorServiceFactory.shutDownExecutorService();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
 //        testImpersonator();
     }
 

@@ -4,11 +4,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.rahul.dbc.contract.chaperone.Chaperone;
-import org.rahul.dbc.contract.chaperone.SingleArgLambdaChaperone;
+import org.rahul.dbc.contract.chaperone.ChaperoneLambda;
 import org.rahul.dbc.contract.flatcontract.FlatContract;
 import org.rahul.dbc.contract.flatcontract.SingleArgCachedFlatContract;
 import org.rahul.dbc.contract.impersonator.Impersonator;
-import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
+import org.rahul.dbc.contract.impersonator.ImpersonatorLambda;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -71,12 +71,12 @@ public class ContractChainExecutorImplTest {
     };
 
 
-    private Impersonator<Object> impersonator1 = new SingleArgLambdaImpersonator<>(arg1 -> {
+    private Impersonator<Object> impersonator1 = new ImpersonatorLambda<>(arg1 -> {
         System.out.println("In Impersonator");
         return arg1;
     }, contract1);
 
-    private Chaperone<Object> chaperone1 = new SingleArgLambdaChaperone<>(arg1 -> {
+    private Chaperone<Object> chaperone1 = new ChaperoneLambda<>(arg1 -> {
         System.out.println("In chaperone1");
     }, contract2);
 

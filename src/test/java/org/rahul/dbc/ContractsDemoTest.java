@@ -4,12 +4,12 @@ import net.lamberto.junit.GuiceJUnitRunner;
 import net.lamberto.junit.GuiceJUnitRunner.GuiceModules;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.rahul.dbc.contract.chaperone.SingleArgLambdaChaperone;
+import org.rahul.dbc.contract.chaperone.ChaperoneLambda;
 import org.rahul.dbc.contract.flatcontract.And;
 import org.rahul.dbc.contract.flatcontract.FlatContract;
 import org.rahul.dbc.contract.flatcontract.Or;
 import org.rahul.dbc.contract.flatcontract.SingleArgCachedFlatContract;
-import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
+import org.rahul.dbc.contract.impersonator.ImpersonatorLambda;
 import org.rahul.dbc.person.Person;
 import org.rahul.dbc.portfolio.Portfolio;
 import org.rahul.dbc.portfolio.PortfolioGenerator;
@@ -105,7 +105,7 @@ public class ContractsDemoTest {
     @Test
     public void demoChaperoneContractHierarchy() {
 
-        new SingleArgLambdaChaperone<>(person ->
+        new ChaperoneLambda<>(person ->
                 System.out.println("Inside the chaperone")
                 , new PersonValidator()).validate(new Person("Rahul", "Shukla"));
 
@@ -120,13 +120,13 @@ public class ContractsDemoTest {
         //Method 2
         System.out.println("--------METHOD 2------------");
 
-        new SingleArgLambdaImpersonator<>(person -> {
+        new ImpersonatorLambda<>(person -> {
             Person p = new Person("Name 1", "Surname 1");
             System.out.println("Person input :: " + person);
             System.out.println("Person changed to ::" + p);
             return p;
         },
-                new SingleArgLambdaImpersonator<>(person -> {
+                new ImpersonatorLambda<>(person -> {
                     Person p = new Person("Name 2", "Surname 2");
                     System.out.println("Person input :: " + person);
                     System.out.println("Person changed to ::" + p);
@@ -139,7 +139,7 @@ public class ContractsDemoTest {
 
         //Method 3
         System.out.println("--------METHOD 3------------");
-        new SingleArgLambdaImpersonator<>(person -> {
+        new ImpersonatorLambda<>(person -> {
             Person p = new Person("Name 2", "Surname 2");
             System.out.println("Person input :: " + person);
             System.out.println("Person changed to ::" + p);

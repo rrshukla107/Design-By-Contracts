@@ -5,14 +5,13 @@ import org.rahul.dbc.contract.flatcontract.FlatContract;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class SingleArgLambdaImpersonator<ARG1> extends AbstractImpersonator<ARG1> {
+public class ImpersonatorLambda<ARG1> extends AbstractImpersonator<ARG1> {
 
 
     private Function<ARG1, ARG1> impersonator;
-    private FlatContract<ARG1> contract;
 
 
-    public SingleArgLambdaImpersonator(Function<ARG1, ARG1> impersonator, FlatContract<ARG1> contract) {
+    public ImpersonatorLambda(Function<ARG1, ARG1> impersonator, FlatContract<ARG1> contract) {
         super(contract);
         this.impersonator = impersonator;
     }

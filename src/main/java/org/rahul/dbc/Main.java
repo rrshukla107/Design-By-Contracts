@@ -2,7 +2,7 @@ package org.rahul.dbc;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
+import org.rahul.dbc.contract.impersonator.ImpersonatorLambda;
 import org.rahul.dbc.executor_factories.ExecutorServiceFactory;
 import org.rahul.dbc.person.Person;
 import org.rahul.dbc.portfolio.Portfolio;
@@ -44,13 +44,13 @@ public class Main {
         //Method 2
         System.out.println("--------METHOD 2------------");
 
-        new SingleArgLambdaImpersonator<>(person -> {
+        new ImpersonatorLambda<>(person -> {
             Person p = new Person("Name 1", "Surname 1");
             System.out.println("Person input :: " + person);
             System.out.println("Person changed to ::" + p);
             return p;
         },
-                new SingleArgLambdaImpersonator<>(person -> {
+                new ImpersonatorLambda<>(person -> {
                     Person p = new Person("Name 2", "Surname 2");
                     System.out.println("Person input :: " + person);
                     System.out.println("Person changed to ::" + p);
@@ -63,7 +63,7 @@ public class Main {
 
         //Method 3
         System.out.println("--------METHOD 3------------");
-        new SingleArgLambdaImpersonator<>(person -> {
+        new ImpersonatorLambda<>(person -> {
             Person p = new Person("Name 2", "Surname 2");
             System.out.println("Person input :: " + person);
             System.out.println("Person changed to ::" + p);

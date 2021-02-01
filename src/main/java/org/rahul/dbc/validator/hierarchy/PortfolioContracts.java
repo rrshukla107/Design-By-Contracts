@@ -1,7 +1,7 @@
 package org.rahul.dbc.validator.hierarchy;
 
 import org.rahul.dbc.contract.flatcontract.FlatContract;
-import org.rahul.dbc.contract.impersonator.SingleArgLambdaImpersonator;
+import org.rahul.dbc.contract.impersonator.ImpersonatorLambda;
 import org.rahul.dbc.person.Person;
 import org.rahul.dbc.portfolio.Portfolio;
 import org.rahul.dbc.validator.ContractFactory;
@@ -31,7 +31,7 @@ public class PortfolioContracts implements ContractFactory {
             return true;
         };
 
-        FlatContract<Portfolio> portfolioValidator2 = new SingleArgLambdaImpersonator<>(
+        FlatContract<Portfolio> portfolioValidator2 = new ImpersonatorLambda<>(
                 portfolio ->
                         new Portfolio(portfolio + "Imp1"),
                 portfolio -> {

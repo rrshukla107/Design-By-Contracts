@@ -27,4 +27,19 @@ public class ContractExecutionEngineImpl implements ContractExecutionEngine {
         return result;
     }
 
+    @Override
+    public <ARG1, ARG2> CompletableFuture<Boolean> submitTask(BiContractWrapper<ARG1, ARG2> contract) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        this.executorService.submit(() -> {
+
+            try {
+                result.complete(contract.getFlatContract().validate(contract.getArg1(), contract.getArg2()));
+            } catch (Throwable e) {
+                result.completeExceptionally(e);
+            }
+        });
+
+        return result;
+    }
+
 }

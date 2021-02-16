@@ -23,7 +23,7 @@ public class PortfolioContracts implements ContractFactory {
 
         FlatContract<Person> personValidator2 = person -> {
             System.out.println("[[PERSON VALIDATOR 2]] person " + person);
-            return false;
+            return true;
         };
 
         FlatContract<Portfolio> portfolioValidator1 = portfolio -> {

@@ -1,5 +1,6 @@
 package org.rahul.dbc.validator;
 
+import org.rahul.dbc.contract.flatcontract.BiFlatContract;
 import org.rahul.dbc.contract.flatcontract.FlatContract;
 
 import java.util.HashMap;
@@ -11,25 +12,42 @@ public class ValidatorFactory {
 
 
     private final Map<String, FlatContract<?>> validationFactory;
-    private List<ContractFactory> factories;
+    private final Map<String, BiFlatContract<?, ?>> biValidationFactory;
 
-    public ValidatorFactory(List<ContractFactory> factories) {
-        this.factories = factories;
+    private final List<ContractFactory> contractfactories;
+    private final List<BiContractFactory> biContractFactories;
+
+    public ValidatorFactory(List<ContractFactory> contractFactories, List<BiContractFactory> biContractFactories) {
+        this.contractfactories = contractFactories;
+        this.biContractFactories = biContractFactories;
         this.validationFactory = new HashMap<>();
+        this.biValidationFactory = new HashMap<>();
+
         this.init();
     }
 
     private void init() {
-        factories.stream()
+        this.contractfactories.stream()
                 .flatMap(factory -> factory
                         .getContracts()
                         .entrySet()
                         .stream())
                 .forEach(entry -> this.validationFactory.put(entry.getKey(), entry.getValue()));
+
+        this.biContractFactories.stream()
+                .flatMap(factory -> factory
+                        .getContracts()
+                        .entrySet()
+                        .stream())
+                .forEach(entry -> this.biValidationFactory.put(entry.getKey(), entry.getValue()));
     }
 
     public Optional<FlatContract<?>> getValidator(String name) {
         return Optional.ofNullable(this.validationFactory.getOrDefault(name, null));
+    }
+
+    public Optional<BiFlatContract<?, ?>> getBiValidator(String name) {
+        return Optional.ofNullable((this.biValidationFactory.getOrDefault(name, null)));
     }
 
 }

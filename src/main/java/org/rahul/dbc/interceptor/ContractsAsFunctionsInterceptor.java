@@ -2,8 +2,8 @@ package org.rahul.dbc.interceptor;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.rahul.dbc.annotations.BiValidate;
 import org.rahul.dbc.annotations.ValidateArg;
-import org.rahul.dbc.annotations.ValidateMultipleArgs;
 import org.rahul.dbc.contract.Contract;
 import org.rahul.dbc.validator.function.Validators;
 
@@ -41,7 +41,7 @@ public class ContractsAsFunctionsInterceptor implements MethodInterceptor {
         List<Contract> contracts = getSingleArgumentContracts(methods, parameters);
 
         // STEP 4 - Go over the method to find all the multiple field validators
-        String[] multipleFieldValidators = invocation.getMethod().getAnnotation(ValidateMultipleArgs.class).value();
+        String[] multipleFieldValidators = invocation.getMethod().getAnnotation(BiValidate.class).value();
 
         // STEP 5 - Parse the method to find all the arguments
         // STEP 6 - For each multiple field validators, create the contract

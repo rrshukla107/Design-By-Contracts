@@ -14,6 +14,7 @@ import org.rahul.dbc.portfolio.PortfolioGenerator;
 import org.rahul.dbc.portfolio.PortfolioGeneratorImpl2;
 import org.rahul.dbc.validator.ValidatorFactory;
 import org.rahul.dbc.validator.function.Validators;
+import org.rahul.dbc.validator.hierarchy.PortfolioBiContracts;
 import org.rahul.dbc.validator.hierarchy.PortfolioContracts;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class ApplicationModule extends AbstractModule {
         bindInterceptor(
                 Matchers.any(),
                 Matchers.annotatedWith(Validate.class),
-                new ContractHierarchyInterceptor(new ValidatorFactory(List.of(new PortfolioContracts())),
+                new ContractHierarchyInterceptor(new ValidatorFactory(List.of(new PortfolioContracts()), List.of(new PortfolioBiContracts())),
                         new ContractChainExecutorImpl(new ContractExecutionEngineImpl(ExecutorServiceFactory.getFixedThreadPoolExecutorService()))));
 
     }

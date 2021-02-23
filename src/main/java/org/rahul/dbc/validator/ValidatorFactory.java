@@ -14,11 +14,11 @@ public class ValidatorFactory {
     private final Map<String, FlatContract<?>> validationFactory;
     private final Map<String, BiFlatContract<?, ?>> biValidationFactory;
 
-    private final List<ContractFactory> contractfactories;
+    private final List<ContractFactory> contractFactories;
     private final List<BiContractFactory> biContractFactories;
 
     public ValidatorFactory(List<ContractFactory> contractFactories, List<BiContractFactory> biContractFactories) {
-        this.contractfactories = contractFactories;
+        this.contractFactories = contractFactories;
         this.biContractFactories = biContractFactories;
         this.validationFactory = new HashMap<>();
         this.biValidationFactory = new HashMap<>();
@@ -27,7 +27,7 @@ public class ValidatorFactory {
     }
 
     private void init() {
-        this.contractfactories.stream()
+        this.contractFactories.stream()
                 .flatMap(factory -> factory
                         .getContracts()
                         .entrySet()

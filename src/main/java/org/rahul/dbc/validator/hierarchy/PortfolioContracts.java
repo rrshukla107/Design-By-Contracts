@@ -16,6 +16,8 @@ public class PortfolioContracts implements ContractFactory {
     public static final String PERSON_VALIDATOR2 = "personValidator2";
     public static final String PORTFOLIO_VALIDATOR1 = "portfolioValidator1";
     public static final String PORTFOLIO_VALIDATOR2 = "portfolioValidator2";
+    public static final String NUMBER_VALIDATOR1 = "numberValidator1";
+    public static final String NUMBER_VALIDATOR2 = "numberValidator2";
 
     private final Map<String, FlatContract<?>> contracts = new HashMap<>();
 
@@ -44,6 +46,9 @@ public class PortfolioContracts implements ContractFactory {
         this.contracts.put(PERSON_VALIDATOR2, personValidator2);
         this.contracts.put(PORTFOLIO_VALIDATOR1, portfolioValidator1);
         this.contracts.put(PORTFOLIO_VALIDATOR2, portfolioValidator2);
+        this.contracts.put(NUMBER_VALIDATOR1, x -> true);
+        this.contracts.put(NUMBER_VALIDATOR2, x -> true);
+
     }
 
 

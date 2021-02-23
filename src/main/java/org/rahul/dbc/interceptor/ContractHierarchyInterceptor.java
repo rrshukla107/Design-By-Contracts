@@ -4,6 +4,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.rahul.dbc.annotations.BiValidate;
+import org.rahul.dbc.annotations.PostValidate;
 import org.rahul.dbc.annotations.Validate;
 import org.rahul.dbc.engine.BiContractWrapper;
 import org.rahul.dbc.engine.ChainResult;
@@ -13,7 +14,6 @@ import org.rahul.dbc.validator.ValidatorFactory;
 
 import javax.inject.Inject;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,11 +41,11 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
 
         // check whether annotations exist or not??
         String[] invariants = invocation.getMethod().getAnnotation(Validate.class).value();
-        Map<String, List<SingleArgContractWrapper<?>>> singleArgContracts = this.getSingleArgContracts(invariants, parameterMappings);
+        Map<String, List<SingleArgContractWrapper<?>>> singleArgContracts = ParserUtil.getContractWrapper(invariants, parameterMappings, this.validatorFactory);
         Map<String, CompletableFuture<ChainResult>> resultMappings = executeSingleArgContracts(singleArgContracts);
 
         String[] biInvariants = invocation.getMethod().getAnnotation(BiValidate.class).value();
-        Map<String, List<BiContractWrapper<?, ?>>> biContracts = this.getBiArgContractWrapper(biInvariants, parameterMappings);
+        Map<String, List<BiContractWrapper<?, ?>>> biContracts = ParserUtil.getBiArgContractWrapper(biInvariants, parameterMappings, this.validatorFactory);
         resultMappings.putAll(this.executeBiContracts(biContracts));
 
         //Join
@@ -53,12 +53,44 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
 
         boolean hasFailed = hasContractFailed(resultMappings);
         //Mock code for reporting -- think about this
-        String result = getContractChainDetails(resultMappings);
+        String preConditionsExecutionResult = getContractChainDetails(resultMappings);
+
+        System.out.println("\n##############PRE-CONDITIONS####################\n");
+        if (hasFailed) {
+            throw new RuntimeException(preConditionsExecutionResult);
+        }
+        System.out.println(preConditionsExecutionResult);
+        Object result = invocation.proceed();
+
+        parameterMappings.put("*", result);
+
+        if (!"void".equals(invocation.getMethod().getReturnType().getName())) {
+            this.evaluatePostCondition(result, invocation, parameterMappings);
+        }
+
+        return result;
+    }
+
+    private void evaluatePostCondition(Object result, MethodInvocation invocation, Map<String, Object> parameterMappings) throws ExecutionException, InterruptedException {
+        String[] invariants = invocation.getMethod().getAnnotation(PostValidate.class).value();
+
+//        invocation.getMethod().getAnnotations()
+
+        Map<String, List<SingleArgContractWrapper<?>>> contractWrappers = ParserUtil.getContractWrapper(invariants, parameterMappings, this.validatorFactory);
+        Map<String, CompletableFuture<ChainResult>> resultMappings = executeSingleArgContracts(contractWrappers);
+
+        CompletableFuture.allOf(resultMappings.values().stream().toArray(CompletableFuture[]::new)).get();
+
+        boolean hasFailed = hasContractFailed(resultMappings);
+        //Mock code for reporting -- think about this
+        String postConditionsExecutionResult = getContractChainDetails(resultMappings);
 
         if (hasFailed) {
-            throw new RuntimeException(result);
+            throw new RuntimeException(postConditionsExecutionResult);
         }
-        return invocation.proceed();
+        System.out.println("\n##############POST-CONDITIONS####################\n");
+
+        System.out.println(postConditionsExecutionResult);
     }
 
     private Map<String, CompletableFuture<ChainResult>> executeSingleArgContracts(Map<String, List<SingleArgContractWrapper<?>>> contracts) throws InterruptedException, ExecutionException {
@@ -72,8 +104,6 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
             resultMappings.put(entry.getKey(), this.contractChainExecutor.executeChain(typeCastedContracts));
         }
 
-//Join
-//        CompletableFuture.allOf(resultMappings.values().stream().toArray(CompletableFuture[]::new)).get();
         return resultMappings;
     }
 
@@ -97,16 +127,24 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
         for (Map.Entry<String, CompletableFuture<ChainResult>> entry : resultMappings.entrySet()) {
 
             ChainResult chainResult = entry.getValue().get();
+            result.append("**************CHAIN - " + entry.getKey() + "**************\n");
             if (chainResult.isSuccessful()) {
-
-                result.append("CHAIN - " + entry.getKey() + " PASSED SUCCESSFULLY\n");
+                result.append("PASSED SUCCESSFULLY\n");
             } else {
-                result.append("CHAIN - " + entry.getKey() + " FAILED\n");
-                result.append("FAILED CONTRACT NAME - " + chainResult.getFailedContractName().get());
-                chainResult.getUnderlyingException()
-                        .map(ExceptionUtils::getStackTrace)
-                        .ifPresent(result::append);
+                result.append("FAILED\n");
+                result.append("FAILED CONTRACT NAME - " + chainResult.getFailedContractName().get() + "\n");
+
+                if (!chainResult.getUnderlyingException().isPresent()) {
+                    result.append("Contract Failed due to Validation Failure \n");
+                } else {
+                    result.append("Contract Failed due to underlying exception - \n");
+                    chainResult.getUnderlyingException()
+                            .map(ExceptionUtils::getStackTrace)
+                            .ifPresent(result::append);
+                    result.append("\n");
+                }
             }
+            System.out.println("******************************************\n");
 
         }
         return result.toString();
@@ -122,64 +160,6 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
             return null;
         }).map(ChainResult::isSuccessful).reduce(true, (a, b) -> a && b);
         return !hasFailed;
-    }
-
-    private Map<String, List<SingleArgContractWrapper<?>>> getSingleArgContracts(String[] invariants, Map<String, Object> parameterMappings) {
-
-        Map<String, List<SingleArgContractWrapper<?>>> invariantChainMappings = new HashMap<>();
-
-        for (String s : invariants) {
-            String[] chainDefinition = s.split("=");
-            String key = chainDefinition[0].strip();
-
-            String[] validatorNames = chainDefinition[1].strip().split(",");
-
-            List<SingleArgContractWrapper<?>> contractWrappers = new ArrayList<>();
-
-            for (String validator : validatorNames) {
-                this.validatorFactory.getValidator(validator.strip())
-                        .map(v -> new SingleArgContractWrapper(validator, v, parameterMappings.get(key))).ifPresent(contractWrappers::add);
-
-            }
-
-            invariantChainMappings.put(key, contractWrappers);
-        }
-
-        return invariantChainMappings;
-
-    }
-
-
-    private Map<String, List<BiContractWrapper<?, ?>>> getBiArgContractWrapper(String[] invariants, Map<String, Object> parameterMappings) {
-
-        Map<String, List<BiContractWrapper<?, ?>>> contractChainMappings = new HashMap<>();
-
-        for (String invariant : invariants) {
-
-            String[] chainDefinition = invariant.split("=");
-            String chainName = chainDefinition[0].strip();
-
-            String[] contractDetails = chainDefinition[1].strip().split("->");
-            List<BiContractWrapper<?, ?>> contractWrappers = new ArrayList<>();
-
-            for (String contract : contractDetails) {
-
-                String strippedContract = contract.strip();
-                String contractName = strippedContract.substring(0, strippedContract.indexOf("(")).strip();
-                String[] args = strippedContract
-                        .substring(strippedContract.indexOf("(") + 1, strippedContract.indexOf(")"))
-                        .strip().split(",");
-
-
-                this.validatorFactory.getBiValidator(contractName)
-                        .map(v -> new BiContractWrapper(contractName, v, parameterMappings.get(args[0].strip()), parameterMappings.get(args[1].strip())))
-                        .ifPresent(contractWrappers::add);
-
-                System.out.println(contractName + args);
-            }
-            contractChainMappings.put(chainName, contractWrappers);
-        }
-        return contractChainMappings;
     }
 
 

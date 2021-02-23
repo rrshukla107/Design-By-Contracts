@@ -4,6 +4,7 @@ import org.rahul.dbc.contract.flatcontract.FlatContract;
 
 import java.util.Map;
 
+@FunctionalInterface
 public interface ContractFactory {
 
     Map<String, FlatContract<?>> getContracts();

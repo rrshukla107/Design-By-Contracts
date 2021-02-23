@@ -33,7 +33,7 @@ public class PortfolioBiContracts implements BiContractFactory {
             System.out.println("++++++++++++++++++++++++++++++++++++++");
             System.out.println(BI_VALIDATOR_2 + "executed successfully");
             System.out.println("++++++++++++++++++++++++++++++++++++++");
-            return false;
+            return true;
         };
 
         this.biContracts.putIfAbsent(BI_VALIDATOR_1, contract1);

@@ -66,8 +66,16 @@ public class TraditionalEquityBuyOrderExecutor {
 
         // Organization Permission
 
+        if (!this.validationService.isValidSecurity(trade.getSecurity())) {
+            throw new Exception(("Security Invalid and not Traded"));
+        }
+
         if (!this.validationService.orgPermittedToTradeSecurity(trade.getSecurity())) {
-            throw new Exception("Security cannot be traded");
+            throw new Exception("Security cannot be traded by the firm");
+        }
+
+        if (!this.validationService.orgTradeLimitExceeded(trade.getSecurity())) {
+            throw new Exception("Trade Limit exceeded");
         }
 
         /*
@@ -86,5 +94,7 @@ public class TraditionalEquityBuyOrderExecutor {
          */
 
         // Business logic code - hashing
+
+
     }
 }

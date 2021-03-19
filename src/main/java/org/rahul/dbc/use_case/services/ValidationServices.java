@@ -1,5 +1,6 @@
 package org.rahul.dbc.use_case.services;
 
+import org.apache.commons.lang3.StringUtils;
 import org.rahul.dbc.use_case.trade.Security;
 import org.rahul.dbc.use_case.trader.Trader;
 
@@ -96,6 +97,16 @@ public class ValidationServices {
         return !trader.getAccount().getAccountNumber().equals("InvalidDailyLimit");
     }
 
+    public boolean isValidSecurity(Security security) {
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return !StringUtils.containsAny(security.getSymbol(), "!@##$%^&*()_+=");
+    }
+
     public boolean orgPermittedToTradeSecurity(Security security) {
         try {
             TimeUnit.SECONDS.sleep(2);
@@ -107,4 +118,13 @@ public class ValidationServices {
     }
 
 
+    public boolean orgTradeLimitExceeded(Security security) {
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return !security.getSymbol().equals("---");
+    }
 }

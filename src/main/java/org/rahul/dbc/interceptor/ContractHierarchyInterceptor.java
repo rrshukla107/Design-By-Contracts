@@ -46,7 +46,6 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
         //Mock code for reporting -- think about this
         String preConditionsExecutionResult = getContractChainDetails(resultMappings);
 
-
         System.out.println("-------");
         System.out.println(new TextReportGenerator().generatePreConditionReport(resultMappings, 10d));
         System.out.println("-------");

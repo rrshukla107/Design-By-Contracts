@@ -1,6 +1,7 @@
 package org.rahul.dbc.report;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.rahul.dbc.engine.ChainResult;
 
 import java.util.Map;
@@ -59,33 +60,54 @@ public class TextReportGenerator implements ReportGenerator {
     public static final String CONTRACT_PASS = ANSI_BRIGHT_GREEN + "PASS" + ANSI_RESET;
     public static final String CONTRACT_FAIL = ANSI_BRIGHT_RED + "FAIL" + ANSI_RESET;
 
+    public static final String UNDERLYING_EXCEPTION = ANSI_BRIGHT_BG_YELLOW +
+            ANSI_BRIGHT_RED + "Failed Due to Underlying Exception - " + ANSI_RESET;
+
+
+    public static final String POST_CONDITION = ANSI_BRIGHT_CYAN + "PRE-CONDITIONS (%.2f milliseconds)" + ANSI_RESET;
+
 
     @Override
     public String generatePreConditionReport(Map<String, CompletableFuture<ChainResult>> resultMappings, Double timeInMillis) {
 
         StringBuilder result = new StringBuilder();
 
+        this.createPreConditionHeader(timeInMillis, result, PRE_CONDITION);
+        this.createContractResult(resultMappings, result);
 
+        return result.toString();
+    }
+
+    @Override
+    public String generatePostConditionReport(Map<String, CompletableFuture<ChainResult>> resultMappings, Double timeInMillis) {
+        StringBuilder result = new StringBuilder();
+
+        this.createPreConditionHeader(timeInMillis, result, POST_CONDITION);
+        this.createContractResult(resultMappings, result);
+
+        return result.toString();
+    }
+
+
+    private void createPreConditionHeader(Double timeInMillis, StringBuilder result, String header) {
+        result.append("\n");
         result.append("-----------------------------------------------------------------------\n");
         result.append(StringUtils.center(String.format(PRE_CONDITION, timeInMillis), 70));
         result.append("\n");
         result.append("-----------------------------------------------------------------------\n");
+    }
 
+    private void createContractResult(Map<String, CompletableFuture<ChainResult>> resultMappings, StringBuilder result) {
         resultMappings.entrySet().forEach(entry -> {
             ChainResult chainResult = this.getChainResult(entry);
             String chainName = entry.getKey();
 
             result.append(this.getChainStatus(chainResult, chainName));
 
-            result.append("\n");
-            result.append("\n");
+            result.append("\n\n");
             result.append(this.getChainDetails(chainResult));
-
-            result.append("\n");
+            result.append("\n\n");
         });
-
-
-        return result.toString();
     }
 
     private StringBuilder getChainDetails(ChainResult chainResult) {
@@ -94,7 +116,6 @@ public class TextReportGenerator implements ReportGenerator {
 
         //header
         this.appendHeader(result);
-
 
         chainResult.getExecutionTimes().forEach((k, v) -> {
 
@@ -109,11 +130,13 @@ public class TextReportGenerator implements ReportGenerator {
             result.append("\n");
         });
 
-        if (chainResult.isSuccessful()) {
-
-
-        }
-
+        chainResult.getUnderlyingException().ifPresent(ex -> {
+            result.append(UNDERLYING_EXCEPTION);
+            result.append("\n");
+            result.append(ANSI_BRIGHT_RED + ANSI_BRIGHT_BG_WHITE +
+                    ExceptionUtils.getStackTrace(ex) + ANSI_RESET);
+            result.append("\n");
+        });
 
         return result;
     }
@@ -187,11 +210,6 @@ public class TextReportGenerator implements ReportGenerator {
             e.printStackTrace();
         }
         return chainResult;
-    }
-
-    @Override
-    public String generatePostConditionReport(Map<String, CompletableFuture<ChainResult>> resultMappings, Double timeInMillis) {
-        return null;
     }
 
 }

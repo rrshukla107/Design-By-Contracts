@@ -64,7 +64,7 @@ public class TextReportGenerator implements ReportGenerator {
             ANSI_BRIGHT_RED + "Failed Due to Underlying Exception - " + ANSI_RESET;
 
 
-    public static final String POST_CONDITION = ANSI_BRIGHT_CYAN + "PRE-CONDITIONS (%.2f milliseconds)" + ANSI_RESET;
+    public static final String POST_CONDITION = ANSI_BRIGHT_CYAN + "POST-CONDITIONS (%.2f milliseconds)" + ANSI_RESET;
 
 
     @Override

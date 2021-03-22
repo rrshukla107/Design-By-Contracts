@@ -41,8 +41,7 @@ public class PortfolioContracts implements ContractFactory {
 
                     System.out.println("[[PORTFOLIO VALIDATOR 2]] portfolio" + portfolio);
 
-                    throw new RuntimeException("Exception");
-//                    return true;
+                    return true;
                 });
 
 

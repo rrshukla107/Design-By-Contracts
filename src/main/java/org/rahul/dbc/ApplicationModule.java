@@ -10,6 +10,7 @@ import org.rahul.dbc.executor_factories.ExecutorServiceFactory;
 import org.rahul.dbc.interceptor.ContractHierarchyInterceptor;
 import org.rahul.dbc.portfolio.PortfolioGenerator;
 import org.rahul.dbc.portfolio.PortfolioGeneratorImpl2;
+import org.rahul.dbc.report.TextReportGenerator;
 import org.rahul.dbc.use_case.services.ValidationServices;
 import org.rahul.dbc.use_case.trade_processing.EquityTradeProcessor;
 import org.rahul.dbc.use_case.trade_processing.NewEquityBuyOrderExecutor;
@@ -48,7 +49,7 @@ public class ApplicationModule extends AbstractModule {
                         new TradeContracts(new ValidationServices()),
                         new TraderContracts(new ValidationServices())),
                         List.of(new PortfolioBiContracts(), new TradeExecutionContracts(new ValidationServices()))),
-                        new ContractChainExecutorImpl(new ContractExecutionEngineImpl(ExecutorServiceFactory.getFixedThreadPoolExecutorService()))));
+                        new ContractChainExecutorImpl(new ContractExecutionEngineImpl(ExecutorServiceFactory.getFixedThreadPoolExecutorService())), new TextReportGenerator()));
 
     }
 }

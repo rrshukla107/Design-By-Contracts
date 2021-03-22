@@ -10,7 +10,7 @@ import org.rahul.dbc.engine.BiContractWrapper;
 import org.rahul.dbc.engine.ChainResult;
 import org.rahul.dbc.engine.ContractChainExecutor;
 import org.rahul.dbc.engine.SingleArgContractWrapper;
-import org.rahul.dbc.report.TextReportGenerator;
+import org.rahul.dbc.report.ReportGenerator;
 import org.rahul.dbc.validator.ValidatorFactory;
 
 import javax.inject.Inject;
@@ -22,14 +22,19 @@ import java.util.stream.Collectors;
 
 public class ContractHierarchyInterceptor implements MethodInterceptor {
 
-    private final ValidatorFactory validatorFactory;
+    public static final String INVOCATION_RESULT = "*";
+    public static final String VOID = "void";
+    public static final double MILLIS = 1000000d;
 
+    private final ValidatorFactory validatorFactory;
     private final ContractChainExecutor contractChainExecutor;
+    private final ReportGenerator reportGenerator;
 
     @Inject
-    public ContractHierarchyInterceptor(final ValidatorFactory validatorFactory, final ContractChainExecutor contractChainExecutor) {
+    public ContractHierarchyInterceptor(final ValidatorFactory validatorFactory, final ContractChainExecutor contractChainExecutor, final ReportGenerator reportGenerator) {
         this.validatorFactory = validatorFactory;
         this.contractChainExecutor = contractChainExecutor;
+        this.reportGenerator = reportGenerator;
     }
 
     @Override
@@ -38,33 +43,45 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
         Parameter[] parameters = invocation.getMethod().getParameters();
         Map<String, Object> parameterMappings = InterceptorUtils.getParameterMappings(invocation, parameters);
 
-        long startTime = System.nanoTime();
-        Map<String, CompletableFuture<ChainResult>> resultMappings = executePreconditions(invocation, parameterMappings);
-        long endTime = System.nanoTime();
-
-        boolean hasFailed = hasContractFailed(resultMappings);
-        //Mock code for reporting -- think about this
-        String preConditionsExecutionResult = getContractChainDetails(resultMappings);
-
-        System.out.println("-------");
-        System.out.println(new TextReportGenerator().generatePreConditionReport(resultMappings, 10d));
-        System.out.println("-------");
-
-
-        System.out.println("\n##############PRE-CONDITIONS####################\n");
-        if (hasFailed) {
-            throw new RuntimeException(preConditionsExecutionResult);
-        }
-        System.out.println(preConditionsExecutionResult);
+        executePreConditions(invocation, parameterMappings);
         Object result = invocation.proceed();
 
-        parameterMappings.put("*", result);
-
-        if (!"void".equals(invocation.getMethod().getReturnType().getName())) {
-            this.evaluatePostCondition(result, invocation, parameterMappings);
-        }
+        parameterMappings.put(INVOCATION_RESULT, result);
+        executePostConditions(invocation, parameterMappings, result);
 
         return result;
+    }
+
+    private void executePreConditions(MethodInvocation invocation, Map<String, Object> parameterMappings) throws InterruptedException, ExecutionException {
+        long preConditionsStartTime = System.nanoTime();
+        Map<String, CompletableFuture<ChainResult>> resultMappings = executePreconditions(invocation, parameterMappings);
+        long preConditionsEndTime = System.nanoTime();
+
+        String preConditionsResult = this.reportGenerator.generatePreConditionReport(resultMappings, (preConditionsEndTime - preConditionsStartTime) / MILLIS);
+
+        if (this.hasContractFailed(resultMappings)) {
+            throw new RuntimeException(preConditionsResult);
+        } else {
+            System.out.println(preConditionsResult);
+        }
+    }
+
+    private void executePostConditions(MethodInvocation invocation, Map<String, Object> parameterMappings, Object result) throws ExecutionException, InterruptedException {
+        if (!VOID.equals(invocation.getMethod().getReturnType().getName())) {
+            long postConditionsStartTime = System.nanoTime();
+            Map<String, CompletableFuture<ChainResult>> postConditionResultMappings = this.evaluatePostCondition(result, invocation, parameterMappings);
+            long postConditionsEndTime = System.nanoTime();
+
+            boolean postContractFailed = hasContractFailed(postConditionResultMappings);
+            String postContractResult = this.reportGenerator.generatePostConditionReport(postConditionResultMappings, (postConditionsEndTime - postConditionsStartTime) / MILLIS);
+
+            if (this.hasContractFailed(postConditionResultMappings)) {
+                throw new RuntimeException(postContractResult);
+            } else {
+                System.out.println(postContractResult);
+            }
+
+        }
     }
 
     private Map<String, CompletableFuture<ChainResult>> executePreconditions(MethodInvocation invocation, Map<String, Object> parameterMappings) throws InterruptedException, ExecutionException {
@@ -97,26 +114,16 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
 
     }
 
-    private void evaluatePostCondition(Object result, MethodInvocation invocation, Map<String, Object> parameterMappings) throws ExecutionException, InterruptedException {
+    private Map<String, CompletableFuture<ChainResult>> evaluatePostCondition(Object result, MethodInvocation invocation, Map<String, Object> parameterMappings) throws ExecutionException, InterruptedException {
         String[] invariants = invocation.getMethod().getAnnotation(PostValidate.class).value();
 
-//        invocation.getMethod().getAnnotations()
 
         Map<String, List<SingleArgContractWrapper<?>>> contractWrappers = ParserUtil.getContractWrapper(invariants, parameterMappings, this.validatorFactory);
         Map<String, CompletableFuture<ChainResult>> resultMappings = executeSingleArgContracts(contractWrappers);
 
         CompletableFuture.allOf(resultMappings.values().stream().toArray(CompletableFuture[]::new)).get();
 
-        boolean hasFailed = hasContractFailed(resultMappings);
-        //Mock code for reporting -- think about this
-        String postConditionsExecutionResult = getContractChainDetails(resultMappings);
-
-        if (hasFailed) {
-            throw new RuntimeException(postConditionsExecutionResult);
-        }
-        System.out.println("\n##############POST-CONDITIONS####################\n");
-
-        System.out.println(postConditionsExecutionResult);
+        return resultMappings;
     }
 
     private Map<String, CompletableFuture<ChainResult>> executeSingleArgContracts(Map<String, List<SingleArgContractWrapper<?>>> contracts) {

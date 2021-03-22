@@ -25,6 +25,7 @@ public class TraditionalEquityBuyOrderExecutor {
             throw new Exception("Invalid trader executing the trade.");
         }
 
+        //bi-va
         if (!trader.getTraderId().equals(trade.getTrader().getTraderId())) {
             throw new Exception("Invalid trader executing the trade");
         }

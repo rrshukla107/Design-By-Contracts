@@ -7,6 +7,7 @@ import org.rahul.dbc.person.Person;
 import org.rahul.dbc.portfolio.Portfolio;
 import org.rahul.dbc.portfolio.PortfolioGenerator;
 import org.rahul.dbc.portfolio.PortfolioGeneratorImpl2;
+import org.rahul.dbc.use_case.trade_processing.NewEquityBuyOrderExecutor;
 
 public class Main {
 
@@ -30,9 +31,17 @@ public class Main {
 
     }
 
-    private static void startApplication(Injector injector) {
+    private static void startApplication(Injector injector) throws Exception {
         PortfolioGenerator portfolioGenerator = injector.getInstance(PortfolioGeneratorImpl2.class);
         portfolioGenerator.generate(new Person("Rahul", "Shukla"), new Portfolio("Rahul's portfolio"));
+
+        NewEquityBuyOrderExecutor orderExecutor = injector.getInstance(NewEquityBuyOrderExecutor.class);
+
+
+//        Trade trade = new Trade();
+//        trade.setTrader(new Trader());
+//
+//        orderExecutor.executeOrder(trade, new Trader());
     }
 
 }

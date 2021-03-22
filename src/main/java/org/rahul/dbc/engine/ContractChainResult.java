@@ -1,5 +1,7 @@
 package org.rahul.dbc.engine;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class ContractChainResult implements ChainResult {
@@ -10,15 +12,19 @@ public class ContractChainResult implements ChainResult {
 
     private final String failedContractName;
 
+    private final Map<String, Double> executionTime;
+
     private ContractChainResult(boolean result, final String underlyingContract) {
         this.result = result;
         this.failedContractName = underlyingContract;
+        this.executionTime = new HashMap<>();
     }
 
     private ContractChainResult(final Throwable exception, final String failedContractName) {
         this.underlyingException = exception;
         this.result = false;
         this.failedContractName = failedContractName;
+        this.executionTime = new HashMap<>();
     }
 
     public static ContractChainResult successfulChainResult() {
@@ -56,6 +62,16 @@ public class ContractChainResult implements ChainResult {
     @Override
     public Optional<String> getFailedContractName() {
         return Optional.ofNullable(this.failedContractName);
+    }
+
+    @Override
+    public Map<String, Double> getExecutionTimes() {
+        return this.executionTime;
+    }
+
+    @Override
+    public void setExecutionTimes(final Map<String, Double> result) {
+        result.entrySet().stream().forEach(entry -> this.executionTime.put(entry.getKey(), entry.getValue()));
     }
 
 }

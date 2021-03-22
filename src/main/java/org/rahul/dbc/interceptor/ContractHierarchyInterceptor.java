@@ -10,13 +10,12 @@ import org.rahul.dbc.engine.BiContractWrapper;
 import org.rahul.dbc.engine.ChainResult;
 import org.rahul.dbc.engine.ContractChainExecutor;
 import org.rahul.dbc.engine.SingleArgContractWrapper;
+import org.rahul.dbc.report.TextReportGenerator;
 import org.rahul.dbc.validator.ValidatorFactory;
 
 import javax.inject.Inject;
 import java.lang.reflect.Parameter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -39,21 +38,19 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
         Parameter[] parameters = invocation.getMethod().getParameters();
         Map<String, Object> parameterMappings = InterceptorUtils.getParameterMappings(invocation, parameters);
 
-        // check whether annotations exist or not??
-        String[] invariants = invocation.getMethod().getAnnotation(Validate.class).value();
-        Map<String, List<SingleArgContractWrapper<?>>> singleArgContracts = ParserUtil.getContractWrapper(invariants, parameterMappings, this.validatorFactory);
-        Map<String, CompletableFuture<ChainResult>> resultMappings = executeSingleArgContracts(singleArgContracts);
-
-        String[] biInvariants = invocation.getMethod().getAnnotation(BiValidate.class).value();
-        Map<String, List<BiContractWrapper<?, ?>>> biContracts = ParserUtil.getBiArgContractWrapper(biInvariants, parameterMappings, this.validatorFactory);
-        resultMappings.putAll(this.executeBiContracts(biContracts));
-
-        //Join
-        CompletableFuture.allOf(resultMappings.values().stream().toArray(CompletableFuture[]::new)).get();
+        long startTime = System.nanoTime();
+        Map<String, CompletableFuture<ChainResult>> resultMappings = executePreconditions(invocation, parameterMappings);
+        long endTime = System.nanoTime();
 
         boolean hasFailed = hasContractFailed(resultMappings);
         //Mock code for reporting -- think about this
         String preConditionsExecutionResult = getContractChainDetails(resultMappings);
+
+
+        System.out.println("-------");
+        System.out.println(new TextReportGenerator().generatePreConditionReport(resultMappings, 10d));
+        System.out.println("-------");
+
 
         System.out.println("\n##############PRE-CONDITIONS####################\n");
         if (hasFailed) {
@@ -69,6 +66,36 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
         }
 
         return result;
+    }
+
+    private Map<String, CompletableFuture<ChainResult>> executePreconditions(MethodInvocation invocation, Map<String, Object> parameterMappings) throws InterruptedException, ExecutionException {
+        // check whether annotations exist or not??
+        Map<String, CompletableFuture<ChainResult>> resultMappings = this.executeSingleArgContracts(invocation, parameterMappings);
+
+        resultMappings.putAll(this.executeBiContracts(invocation, parameterMappings));
+
+        //Join
+        CompletableFuture.allOf(resultMappings.values().stream().toArray(CompletableFuture[]::new)).get();
+        return resultMappings;
+    }
+
+    private Map<String, CompletableFuture<ChainResult>> executeBiContracts(MethodInvocation invocation, Map<String, Object> parameterMappings) {
+
+        return Optional.ofNullable(invocation.getMethod().getAnnotation(BiValidate.class)).map(annotation -> annotation.value()).map(biInvariants -> {
+            Map<String, List<BiContractWrapper<?, ?>>> biContracts = ParserUtil.getBiArgContractWrapper(biInvariants, parameterMappings, this.validatorFactory);
+            return this.executeBiContracts(biContracts);
+        }).orElse(Collections.emptyMap());
+
+    }
+
+    private Map<String, CompletableFuture<ChainResult>> executeSingleArgContracts(MethodInvocation invocation, Map<String, Object> parameterMappings) throws InterruptedException, ExecutionException {
+
+        return Optional.ofNullable(invocation.getMethod().getAnnotation(Validate.class)).map(annotation -> annotation.value()).map(invariants -> {
+            Map<String, List<SingleArgContractWrapper<?>>> singleArgContracts = ParserUtil.getContractWrapper(invariants, parameterMappings, this.validatorFactory);
+            return this.executeSingleArgContracts(singleArgContracts);
+        }).orElse(Collections.emptyMap());
+
+
     }
 
     private void evaluatePostCondition(Object result, MethodInvocation invocation, Map<String, Object> parameterMappings) throws ExecutionException, InterruptedException {
@@ -93,7 +120,7 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
         System.out.println(postConditionsExecutionResult);
     }
 
-    private Map<String, CompletableFuture<ChainResult>> executeSingleArgContracts(Map<String, List<SingleArgContractWrapper<?>>> contracts) throws InterruptedException, ExecutionException {
+    private Map<String, CompletableFuture<ChainResult>> executeSingleArgContracts(Map<String, List<SingleArgContractWrapper<?>>> contracts) {
         Map<String, CompletableFuture<ChainResult>> resultMappings = new HashMap<>();
 
         //Fork
@@ -101,7 +128,7 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
             List<SingleArgContractWrapper<Object>> typeCastedContracts = entry.getValue().stream()
                     .map(contract -> (SingleArgContractWrapper<Object>) contract)
                     .collect(Collectors.toList());
-            resultMappings.put(entry.getKey(), this.contractChainExecutor.executeChain(typeCastedContracts));
+            resultMappings.put(entry.getKey(), this.contractChainExecutor.executeContractChain(typeCastedContracts));
         }
 
         return resultMappings;
@@ -144,6 +171,7 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
                     result.append("\n");
                 }
             }
+            entry.getValue().get().getExecutionTimes().entrySet().stream().forEach(e -> result.append(e.getKey() + " " + e.getValue() + "ms \n"));
             System.out.println("******************************************\n");
 
         }

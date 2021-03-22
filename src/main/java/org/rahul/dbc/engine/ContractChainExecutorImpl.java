@@ -1,6 +1,8 @@
 package org.rahul.dbc.engine;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,12 +16,13 @@ public class ContractChainExecutorImpl implements ContractChainExecutor {
     }
 
     @Override
-    public <ARG1> CompletableFuture<ChainResult> executeChain(final List<SingleArgContractWrapper<ARG1>> contractChain) {
+    public <ARG1> CompletableFuture<ChainResult> executeContractChain(final List<SingleArgContractWrapper<ARG1>> contractChain) {
 
         CompletableFuture<ChainResult> result = new CompletableFuture<>();
         AtomicInteger i = new AtomicInteger(0);
+        Map<String, Double> executionTimeAccumulator = new HashMap<>();
 
-        this.executeTask(result, i, contractChain);
+        this.executeTask(result, i, contractChain, executionTimeAccumulator);
 
         return result;
     }
@@ -29,51 +32,78 @@ public class ContractChainExecutorImpl implements ContractChainExecutor {
         CompletableFuture<ChainResult> result = new CompletableFuture<>();
         AtomicInteger i = new AtomicInteger(0);
 
-        this.executeBiTask(result, i, contractChain);
+        Map<String, Double> executionTimeAccumulator = new HashMap<>();
+
+        this.executeBiTask(result, i, contractChain, executionTimeAccumulator);
 
         return result;
     }
 
-    private <ARG1> void executeTask(CompletableFuture<ChainResult> result, AtomicInteger index, final List<SingleArgContractWrapper<ARG1>> contractChain) {
+    private <ARG1> void executeTask(CompletableFuture<ChainResult> result, AtomicInteger index, final List<SingleArgContractWrapper<ARG1>> contractChain, Map<String, Double> accumulator) {
 
 
-        this.contractExecutionEngine.submitTask(contractChain.get(index.getAndIncrement())).whenComplete((isSuccessful, failure) -> {
+        this.contractExecutionEngine.submitTask(contractChain.get(index.getAndIncrement())).whenComplete((contractExecutionResult, failure) -> {
 
+            String contractName = contractChain.get(index.get() - 1).getContractName();
             if (failure != null) {
+
+                ContractChainResult contractChainResult = ContractChainResult.failedChainResultDueToException(
+                        contractName, failure);
+                contractChainResult.setExecutionTimes(accumulator);
                 result.complete(
-                        ContractChainResult.failedChainResultDueToException(
-                                contractChain.get(index.get() - 1).getContractName(), failure));
-            } else if (!isSuccessful) {
-                result.complete(
-                        ContractChainResult.failedChainResult(contractChain.get(index.get() - 1).getContractName()));
+                        contractChainResult);
+
+            } else if (!contractExecutionResult.getResult()) {
+                ContractChainResult contractChainResult = ContractChainResult.failedChainResult(contractName);
+                accumulator.put(contractName, contractExecutionResult.getRunTime());
+                contractChainResult.setExecutionTimes(accumulator);
+                result.complete(contractChainResult);
+
             } else if (index.get() < contractChain.size()) {
-                this.executeTask(result, index, contractChain);
+                accumulator.put(contractName, contractExecutionResult.getRunTime());
+                this.executeTask(result, index, contractChain, accumulator);
 
             } else if (index.get() == contractChain.size()) {
-                result.complete(ContractChainResult.successfulChainResult());
+                accumulator.put(contractName, contractExecutionResult.getRunTime());
+                ContractChainResult contractChainResult = ContractChainResult.successfulChainResult();
+                contractChainResult.setExecutionTimes(accumulator);
+                result.complete(contractChainResult);
+
             }
 
         });
 
     }
 
-    private <ARG1, ARG2> void executeBiTask(CompletableFuture<ChainResult> result, AtomicInteger index, final List<BiContractWrapper<ARG1, ARG2>> contractChain) {
+    private <ARG1, ARG2> void executeBiTask(CompletableFuture<ChainResult> result, AtomicInteger index, final List<BiContractWrapper<ARG1, ARG2>> contractChain, Map<String, Double> accumulator) {
 
 
-        this.contractExecutionEngine.submitTask(contractChain.get(index.getAndIncrement())).whenComplete((isSuccessful, failure) -> {
+        this.contractExecutionEngine.submitTask(contractChain.get(index.getAndIncrement())).whenComplete((contractExecutionResult, failure) -> {
+            String contractName = contractChain.get(index.get() - 1).getContractName();
 
             if (failure != null) {
+
+                ContractChainResult contractChainResult = ContractChainResult.failedChainResultDueToException(
+                        contractName, failure);
+                contractChainResult.setExecutionTimes(accumulator);
+                result.complete(contractChainResult);
+
+            } else if (!contractExecutionResult.getResult()) {
+                ContractChainResult contractChainResult = ContractChainResult.failedChainResult(contractName);
+                accumulator.put(contractName, contractExecutionResult.getRunTime());
+                contractChainResult.setExecutionTimes(accumulator);
                 result.complete(
-                        ContractChainResult.failedChainResultDueToException(
-                                contractChain.get(index.get() - 1).getContractName(), failure));
-            } else if (!isSuccessful) {
-                result.complete(
-                        ContractChainResult.failedChainResult(contractChain.get(index.get() - 1).getContractName()));
+                        contractChainResult);
+
             } else if (index.get() < contractChain.size()) {
-                this.executeBiTask(result, index, contractChain);
+                accumulator.put(contractName, contractExecutionResult.getRunTime());
+                this.executeBiTask(result, index, contractChain, accumulator);
 
             } else if (index.get() == contractChain.size()) {
-                result.complete(ContractChainResult.successfulChainResult());
+                accumulator.put(contractName, contractExecutionResult.getRunTime());
+                ContractChainResult contractChainResult = ContractChainResult.successfulChainResult();
+                contractChainResult.setExecutionTimes(accumulator);
+                result.complete(contractChainResult);
             }
 
         });

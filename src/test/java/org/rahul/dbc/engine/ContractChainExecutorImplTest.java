@@ -94,7 +94,7 @@ public class ContractChainExecutorImplTest {
     public void testSuccessfulChain() throws InterruptedException, ExecutionException {
 
 
-        CompletableFuture<ChainResult> promise = this.chainExecutor.executeChain(List.of(this.getWrapper("contract1", contract1, new Object())
+        CompletableFuture<ChainResult> promise = this.chainExecutor.executeContractChain(List.of(this.getWrapper("contract1", contract1, new Object())
                 , this.getWrapper("contract2", contract2, new Object())
                 , this.getWrapper("contract3", contract3, new Object())));
 
@@ -107,7 +107,7 @@ public class ContractChainExecutorImplTest {
     @Test
     public void testChainWithContractHierarchy() throws ExecutionException, InterruptedException {
 
-        CompletableFuture<ChainResult> promise = this.chainExecutor.executeChain(List.of(
+        CompletableFuture<ChainResult> promise = this.chainExecutor.executeContractChain(List.of(
                 this.getWrapper("contract1", contract1, new Object())
                 , this.getWrapper("impersonator1", impersonator1, new Object())
                 , this.getWrapper("chaperone1", chaperone1, new Object())
@@ -123,7 +123,7 @@ public class ContractChainExecutorImplTest {
     @Test
     public void testChainWithFailure() throws InterruptedException, ExecutionException {
 
-        CompletableFuture<ChainResult> promise = this.chainExecutor.executeChain(List.of(this.getWrapper("contract1", contract1, new Object())
+        CompletableFuture<ChainResult> promise = this.chainExecutor.executeContractChain(List.of(this.getWrapper("contract1", contract1, new Object())
                 , this.getWrapper("contractFailure", contractFailure1, new Object())
                 , this.getWrapper("contract3", contract3, new Object())));
 
@@ -139,7 +139,7 @@ public class ContractChainExecutorImplTest {
     @Test
     public void testChainWithException() throws ExecutionException, InterruptedException {
 
-        CompletableFuture<ChainResult> promise = this.chainExecutor.executeChain(List.of(this.getWrapper("contract1", contract1, new Object()),
+        CompletableFuture<ChainResult> promise = this.chainExecutor.executeContractChain(List.of(this.getWrapper("contract1", contract1, new Object()),
                 this.getWrapper("contractException", this.contractWithRuntimeError, new Object()),
                 this.getWrapper("contract3", contract3, new Object())));
 
@@ -163,9 +163,9 @@ public class ContractChainExecutorImplTest {
 
         //FORK
         CompletableFuture<ChainResult>[] promises = new CompletableFuture[]{
-                this.chainExecutor.executeChain(chain),
-                this.chainExecutor.executeChain(chain),
-                this.chainExecutor.executeChain(chain)};
+                this.chainExecutor.executeContractChain(chain),
+                this.chainExecutor.executeContractChain(chain),
+                this.chainExecutor.executeContractChain(chain)};
 
         try {
             // JOIN
@@ -198,9 +198,9 @@ public class ContractChainExecutorImplTest {
 
         //FORK
         CompletableFuture<ChainResult>[] promises = new CompletableFuture[]{
-                this.chainExecutor.executeChain(successfulChain),
-                this.chainExecutor.executeChain(chainWithFailure),
-                this.chainExecutor.executeChain(chainWithExceptions)};
+                this.chainExecutor.executeContractChain(successfulChain),
+                this.chainExecutor.executeContractChain(chainWithFailure),
+                this.chainExecutor.executeContractChain(chainWithExceptions)};
 
         try {
             // JOIN

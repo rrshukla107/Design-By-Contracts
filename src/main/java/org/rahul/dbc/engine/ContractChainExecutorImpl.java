@@ -49,6 +49,8 @@ public class ContractChainExecutorImpl implements ContractChainExecutor {
 
                 ContractChainResult contractChainResult = ContractChainResult.failedChainResultDueToException(
                         contractName, failure);
+                // We cannot time the execution time for contracts which have failed due to exception
+                accumulator.put(contractName, 0d);
                 contractChainResult.setExecutionTimes(accumulator);
                 result.complete(
                         contractChainResult);
@@ -82,7 +84,8 @@ public class ContractChainExecutorImpl implements ContractChainExecutor {
             String contractName = contractChain.get(index.get() - 1).getContractName();
 
             if (failure != null) {
-
+                // We cannot time the execution time for contracts which have failed due to exception
+                accumulator.put(contractName, 0d);
                 ContractChainResult contractChainResult = ContractChainResult.failedChainResultDueToException(
                         contractName, failure);
                 contractChainResult.setExecutionTimes(accumulator);

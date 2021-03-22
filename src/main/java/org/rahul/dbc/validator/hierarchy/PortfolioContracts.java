@@ -8,7 +8,6 @@ import org.rahul.dbc.validator.ContractFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class PortfolioContracts implements ContractFactory {
 
@@ -40,14 +39,10 @@ public class PortfolioContracts implements ContractFactory {
                         new Portfolio(portfolio + "Imp1"),
                 portfolio -> {
 
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
                     System.out.println("[[PORTFOLIO VALIDATOR 2]] portfolio" + portfolio);
-                    return true;
+
+                    throw new RuntimeException("Exception");
+//                    return true;
                 });
 
 

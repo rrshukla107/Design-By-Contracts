@@ -6,16 +6,16 @@ import java.util.concurrent.TimeUnit;
 
 public class ExecutorServiceFactory {
 
-    private static ExecutorService FIXED_THREAD_POOL_SIZE_3 = Executors.newFixedThreadPool(3);
+    private static ExecutorService FIXED_THREAD_POOL = Executors.newFixedThreadPool(6);
 
 
     public static ExecutorService getFixedThreadPoolExecutorService() {
-        return FIXED_THREAD_POOL_SIZE_3;
+        return FIXED_THREAD_POOL;
     }
 
     public static void shutDownExecutorService() throws InterruptedException {
-        FIXED_THREAD_POOL_SIZE_3.shutdown();
-        FIXED_THREAD_POOL_SIZE_3.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+        FIXED_THREAD_POOL.shutdown();
+        FIXED_THREAD_POOL.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
     }
 
 }

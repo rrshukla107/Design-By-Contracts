@@ -2,19 +2,24 @@ package org.rahul.dbc.use_case.trade_processing;
 
 import org.rahul.dbc.use_case.services.ValidationServices;
 import org.rahul.dbc.use_case.trade.Trade;
+import org.rahul.dbc.use_case.trade.TradeConfirmation;
 import org.rahul.dbc.use_case.trader.Trader;
 
+import javax.inject.Inject;
 import java.util.Optional;
 
 public class TraditionalEquityBuyOrderExecutor {
 
     private ValidationServices validationService;
+    private TradeProcessor tradeProcessor;
 
-    TraditionalEquityBuyOrderExecutor(ValidationServices validationService) {
+    @Inject
+    TraditionalEquityBuyOrderExecutor(ValidationServices validationService, TradeProcessor tradeProcessor) {
         this.validationService = validationService;
+        this.tradeProcessor = tradeProcessor;
     }
 
-    public void executeOrder(Trade trade, Trader trader) throws Exception {
+    public TradeConfirmation executeOrder(Trade trade, Trader trader) throws Exception {
 
         // Trader credentials
         if (Optional.ofNullable(trade.getTrader()).map(Trader::getTraderId).isEmpty()) {
@@ -94,8 +99,12 @@ public class TraditionalEquityBuyOrderExecutor {
          *
          */
 
-        // Business logic code - hashing
+        TradeConfirmation tradeConfirmation = this.tradeProcessor.executeTrade(trade);
 
+        if (tradeConfirmation.getCommissionPaid() > 1000d) {
+            throw new Exception("Trade Overpriced");
+        }
 
+        return tradeConfirmation;
     }
 }

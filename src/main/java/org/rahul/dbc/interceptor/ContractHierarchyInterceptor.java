@@ -115,15 +115,23 @@ public class ContractHierarchyInterceptor implements MethodInterceptor {
     }
 
     private Map<String, CompletableFuture<ChainResult>> evaluatePostCondition(Object result, MethodInvocation invocation, Map<String, Object> parameterMappings) throws ExecutionException, InterruptedException {
-        String[] invariants = invocation.getMethod().getAnnotation(PostValidate.class).value();
 
+        return Optional.ofNullable(invocation.getMethod().getAnnotation(PostValidate.class)).map(i -> {
 
-        Map<String, List<SingleArgContractWrapper<?>>> contractWrappers = ParserUtil.getContractWrapper(invariants, parameterMappings, this.validatorFactory);
-        Map<String, CompletableFuture<ChainResult>> resultMappings = executeSingleArgContracts(contractWrappers);
+            String[] invariants = i.value();
+            Map<String, List<SingleArgContractWrapper<?>>> contractWrappers = ParserUtil.getContractWrapper(invariants, parameterMappings, this.validatorFactory);
+            Map<String, CompletableFuture<ChainResult>> resultMappings = executeSingleArgContracts(contractWrappers);
 
-        CompletableFuture.allOf(resultMappings.values().stream().toArray(CompletableFuture[]::new)).get();
+            try {
+                CompletableFuture.allOf(resultMappings.values().stream().toArray(CompletableFuture[]::new)).get();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        return resultMappings;
+            return resultMappings;
+
+        }).orElse(Collections.emptyMap());
+
     }
 
     private Map<String, CompletableFuture<ChainResult>> executeSingleArgContracts(Map<String, List<SingleArgContractWrapper<?>>> contracts) {

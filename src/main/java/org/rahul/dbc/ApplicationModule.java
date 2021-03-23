@@ -15,6 +15,7 @@ import org.rahul.dbc.use_case.services.ValidationServices;
 import org.rahul.dbc.use_case.trade_processing.EquityTradeProcessor;
 import org.rahul.dbc.use_case.trade_processing.NewEquityBuyOrderExecutor;
 import org.rahul.dbc.use_case.trade_processing.TradeProcessor;
+import org.rahul.dbc.use_case.trade_processing.TraditionalEquityBuyOrderExecutor;
 import org.rahul.dbc.use_case.trading_validations.TradeContracts;
 import org.rahul.dbc.use_case.trading_validations.TradeExecutionContracts;
 import org.rahul.dbc.use_case.trading_validations.TraderContracts;
@@ -34,8 +35,11 @@ public class ApplicationModule extends AbstractModule {
         bind(PortfolioGenerator.class).to(PortfolioGeneratorImpl2.class);
 //        bind(ValidatorFactory.class).in(Singleton.class);
 
+
         bind(TradeProcessor.class).to(EquityTradeProcessor.class);
         bind(NewEquityBuyOrderExecutor.class);
+        bind(ValidationServices.class);
+        bind(TraditionalEquityBuyOrderExecutor.class);
 
 //        bindInterceptor(
 //                Matchers.any(),

@@ -3,6 +3,7 @@ package org.rahul.dbc.use_case.trading_validations;
 import org.rahul.dbc.contract.flatcontract.FlatContract;
 import org.rahul.dbc.use_case.services.ValidationServices;
 import org.rahul.dbc.use_case.trade.Trade;
+import org.rahul.dbc.use_case.trade.TradeConfirmation;
 import org.rahul.dbc.validator.ContractFactory;
 
 import java.util.HashMap;
@@ -15,6 +16,8 @@ public class TradeContracts implements ContractFactory {
     public static final String VALID_SECURITY = "isValidSecurity";
     public static final String SECURITY_PERMITTED = "orgPermittedToTradeSecurity";
     public static final String SECURITY_UNDER_TRADING_LIMIT = "orgTradeLimitExceeded";
+
+    public static final String TRADE_CONFIRMATION_NOT_OVERPRICED = "tradeConfirmationNotOverpriced";
 
     private ValidationServices validationService;
 
@@ -63,6 +66,14 @@ public class TradeContracts implements ContractFactory {
         this.contracts.put(SECURITY_UNDER_TRADING_LIMIT, (Trade trade) -> {
             if (!this.validationService.orgTradeLimitExceeded(trade.getSecurity())) {
                 throw new RuntimeException("Trade Limit exceeded");
+            }
+
+            return true;
+        });
+
+        this.contracts.put(TRADE_CONFIRMATION_NOT_OVERPRICED, (TradeConfirmation tradeConfirmation) -> {
+            if (tradeConfirmation.getCommissionPaid() > 1001d) {
+                throw new RuntimeException("Trade Overpriced");
             }
 
             return true;

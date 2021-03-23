@@ -92,7 +92,7 @@ public class TextReportGenerator implements ReportGenerator {
     private void createPreConditionHeader(Double timeInMillis, StringBuilder result, String header) {
         result.append("\n");
         result.append("-----------------------------------------------------------------------\n");
-        result.append(StringUtils.center(String.format(PRE_CONDITION, timeInMillis), 70));
+        result.append(StringUtils.center(String.format(header, timeInMillis), 70));
         result.append("\n");
         result.append("-----------------------------------------------------------------------\n");
     }

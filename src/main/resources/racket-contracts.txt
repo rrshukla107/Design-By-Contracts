@@ -1,0 +1,64 @@
+
+
+
+(define (add15 x) (+ x 15))
+(define add15+print
+(impersonate-procedure add15
+                      (λ (x)
+                         (printf "called with ~s\n" x)
+                         (values (λ (res)
+                                  (printf "returned ~s\n" res)
+                                  res)
+                                 (+ x 15)))))
+
+' (add15 27)
+' (add15+print 27)
+
+
+(define add15+print2
+(chaperone-procedure add15
+                        (λ (x)
+                            (printf "called with ~s\n" x)
+                             (values (λ (res)
+                                      (printf "returned ~s\n" res)
+                                      res)
+                                      x))))
+' (define s2 (s "not a fun"))
+' (app-prop s2 5)
+
+' (add15+print2 27)
+
+(define (num-between-1-100? i) (<= 0 i 100))
+
+
+(define num-between-1-150?
+(impersonate-procedure num-between-1-100?
+                      (λ (x)
+                         (printf "called with input - ~s\n" x)
+                         (values (λ (res)
+                                  (printf "returned - ~s\n" res)
+                                  res)
+                                 (- x 50)))))
+
+
+(define num-between-1-100?+log
+(chaperone-procedure num-between-1-100?
+                    (λ (x)
+                        (printf "called with input - ~s\n" x)
+                        (values (λ (res)
+                                  (printf "returned - ~s\n" res)
+                                  res)
+                                  x))))
+
+
+
+(define/contract (sqr2 i)
+    (-> num-between-1-100?+log any)
+    (* i i)
+    )
+
+
+' (-> num-between-1-150? any)
+
+' (print (num-between-1-100? 101))
+(print (sqr2 102))

@@ -28,6 +28,7 @@ public class NewEquityBuyOrderExecutor implements OrderExecutor {
     @PostValidate(value = {"trade-confirmation = tradeConfirmationNotOverpriced(*)"})
     public TradeConfirmation executeOrder(Trade trade, Trader trader) throws Exception {
 
+        //only business logic
         return this.tradeProcessor.executeTrade(trade);
     }
 
